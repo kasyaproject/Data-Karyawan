@@ -7,10 +7,12 @@
         <!-- TOMBOL TAMBAH END-->
           <div class="flex justify-between">
               <div class="relative w-[30%] m-8">
+                <!-- Search input
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
-                </div>
-                <input type="text" id="searchInput" name="searchInput" class="flex border rounded-lg w-full py-2 px-10" placeholder="Cari berdasarkan nama...">
+                </div>                
+                  <input type="search" id="search" name="search" class="flex border rounded-lg w-full py-2 px-10" placeholder="Cari data...">
+                -->
               </div>
               <a href="/tambah_data">
                   <button class="bg-blue-500 text-white font-bold px-4 py-2 m-8 rounded">Tambah Data</button>
@@ -103,9 +105,13 @@
             </form>
           <!-- MODAL DELETE END-->
              
-          <!-- CARD KARYAWAN-->
-            <div id="searchResults">
+          <!-- CARD KARYAWAN ALL-->
+            <div id="alldata" class="alldata">
               @include('card-karyawan',['data' => $data])
+            </div>
+          <!-- CARD KARYAWAN END-->
+          <!-- CARD KARYAWAN SEARCH-->
+            <div id="searchResults" class="searchResults">
             </div>
           <!-- CARD KARYAWAN END-->
           @endforeach
@@ -113,7 +119,31 @@
       </div>
 
       <!-- SCRIPT SEARCH -->
-        <script>
+        <script type="text/javascript">
+          $('#search').on('keyup',function()
+          {
+            $value=$(this).val();
+            //alert($value);
+
+            if($value){
+              $('.alldata').hide();
+              $('.searchResults').show();
+            } else {
+              $('.alldata').hide();
+              $('.searchResults').show();
+            }
+
+            $.ajax({
+              type:'get',
+              url:'{{ URL::to('search') }}',
+              data:{'search':$value},
+
+              success:function(data){
+                console.log(data);
+                $('#searchResults').html(data);
+              }
+            })
+          })
         </script>
       <!-- SCRIPT SEARCH END -->
 

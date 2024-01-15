@@ -8,6 +8,7 @@ use App\Http\Controllers\karyawanController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\penilaianController;
 use App\Http\Controllers\rangkingController;
+use App\Http\Controllers\passwordController;
 use App\Http\Controllers\notifController;
 
 
@@ -33,7 +34,7 @@ Route::middleware('auth')->group(function () {
 
     //halaman awal
     Route::get('/dashboard', [Controller::class, 'index'])->name('dashboard');
-    // routes/web.php
+    //mencari data karyawan
     Route::get('/search', [Controller::class, 'search']);
 
     //lihat detail data karyawan
@@ -66,6 +67,8 @@ Route::middleware('auth')->group(function () {
     //edit akun
     Route::get('/akun/{id}', [aksesController::class, 'detail'])->name('akun.lihat');
     Route::put('/akun/{id}', [aksesController::class, 'update'])->name('akun.update');
+    //ganti password akun 
+    Route::put('/akun/ubah/{id}', [passwordController::class, 'update'])->name('akun.ubah');
 
     //view form penilaian
     Route::get('/data/form/{nik}', [penilaianController::class, 'form'])->name('penilaian.form');

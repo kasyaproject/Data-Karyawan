@@ -51,7 +51,7 @@
           <div class="grid md:grid-cols-1 md:gap-6">
             <div class="relative z-0 w-full mb-6 group">
               <label for="nama" class="block text-gray-600 text-sm mb-2">Nama Lengkap</label>  
-              <input name="nama" type="text" maxlength="30" class="w-full px-4 py-2 border-2 rounded-md ring-black" value="{{ old('nama') }}" placeholder="Masukan Nama Lengkap" required oninput="this.value = this.value.replace(/[^A-Za-z]/g, '');">
+              <input name="nama" type="text" maxlength="30" class="w-full px-4 py-2 border-2 rounded-md ring-black" value="{{ old('nama') }}" placeholder="Masukan Nama Lengkap" required oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '');">
               @error('nama')
               <p id="filled_error_help" class="mt-2 text-xs text-red-600 dark:text-green-400">{{ $message }}</p>
               @enderror
@@ -67,7 +67,7 @@
               </div>
               <div class="relative z-0 w-full mb-6 group">
                 <label for="nik" class="block text-gray-600 text-sm mb-2">NIK</label>  
-                <input name="nik" type="number" maxlength="20" class="w-full px-4 py-2 border-2 rounded-md ring-black appearance-none no-spin" value="{{ old('nik') }}" placeholder="Masukan NIK akun" required>
+                <input name="nik" type="number" maxlength="20" class="w-full px-4 py-2 border-2 rounded-md ring-black appearance-none no-spin" value="{{ old('nik') }}" placeholder="Masukan NIK akun" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 @error('nik')
                 <p id="filled_error_help" class="mt-2 text-xs text-red-600 dark:text-green-400">{{ $message }}</p>
                 @enderror

@@ -34,31 +34,43 @@ class Controller extends BaseController
 
         return view('/dashboard', compact('data'));
     }
-    // app/Http/Controllers/SearchController.php
+
     public function search(Request $request)
     {
-        $search = $request->get('search');
         $user = Auth::user();
+        $search = $request->input('search');
+        $output = NULL;
 
-        if ($user->hak_akses === 'admin') {
-            $data = data_karyawan::with('image')
-                ->where(function ($query) use ($search) {
-                    $query->where('nama', 'like', '%' . $search . '%')
-                        ->orWhere('nik', 'like', '%' . $search . '%');
-                })
+        if (!empty($search)) {
+            $query = data_karyawan::with('image')
+                ->where('nama', 'like', '%' . $search . '%');
+
+            if ($user->hak_akses === 'admin') {
+                $data = $query->orderBy('nama', 'asc')->get();
+            } elseif ($user->hak_akses === 'user') {
+                $data = $query
+                    ->where('unit', $user->divisi)
+                    ->get();
+            }
+        } else {
+            $query = data_karyawan::with('image')
                 ->orderBy('nama', 'asc')
                 ->get();
-        } elseif ($user->hak_akses === 'user') {
-            $data = data_karyawan::with('image')
-                ->where('unit', $user->divisi)
-                ->where(function ($query) use ($search) {
-                    $query->where('nama', 'like', '%' . $search . '%')
-                        ->orWhere('nik', 'like', '%' . $search . '%');
-                })
-                ->orderBy('nama', 'asc')
-                ->get();
+
+            if ($user->hak_akses === 'admin') {
+                $data = $query->orderBy('nama', 'asc')->get();
+            } elseif ($user->hak_akses === 'user') {
+                $data = $query
+                    ->where('unit', $user->divisi)
+                    ->orderBy('nama', 'asc')
+                    ->get();
+            }
         }
 
-        return view('/dashboard', compact('data'));
+        foreach ($data as $item) {
+            $output = view('card-karyawan', ['data' => $item])->render();
+        }
+
+        return response($output);
     }
 }

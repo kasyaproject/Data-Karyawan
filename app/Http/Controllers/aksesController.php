@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\divisi;
 use Illuminate\Support\Facades\Hash;
@@ -87,6 +88,8 @@ class aksesController extends Controller
         $akun = User::find($id);
         $pilihan = divisi::all();
 
+        //$akun->decrypt_pass = Crypt::decrypt($akun->password);
+
         if (!$akun) {
             return redirect('akun.daftar_akses')->with('error', 'Data tidak ditemukan.');
         }
@@ -98,6 +101,7 @@ class aksesController extends Controller
     public function update(Request $request, $id)
     {
         $akun = User::find($id);
+        $user = Auth::user();
 
         if (!$akun) {
             return redirect('akun.lihat')->with('error', 'Data tidak ditemukan.');
@@ -106,7 +110,7 @@ class aksesController extends Controller
         // Validasi data dari formulir
         $request->validate([
             'username' => 'required|string|max:255',
-            'hak_akses' => 'required|string|max:255',
+            'hak_akses' => 'required|string|max:255|in:user,admin', // Menambahkan aturan validasi in:user,admin
             'jabatan' => 'required|string|max:255',
             'divisi' => 'required|string|max:255',
             // Tambahkan aturan validasi lainnya sesuai kebutuhan
@@ -120,6 +124,10 @@ class aksesController extends Controller
         // Update data lainnya sesuai kebutuhan
         $akun->save();
 
-        return redirect('/daftar_akses')->with('success', 'Data berhasil diperbarui.');
+        if ($user->hak_akses === 'admin') {
+            return redirect('/daftar_akses')->with('success', 'Data berhasil diperbarui.');
+        } elseif ($user->hak_akses === 'user') {
+            return redirect()->route('akun.lihat', ['id' => $akun->id])->with('success', 'Data berhasil diperbarui.');
+        }
     }
 }

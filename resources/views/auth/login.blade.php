@@ -36,7 +36,6 @@
           </div>
           <div class="flex items-center justify-between">
             <button class="w-full px-4 py-2 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 focus:outline-none" type="submit">Login</button>
-            
           </div>
         </form>
       </div>

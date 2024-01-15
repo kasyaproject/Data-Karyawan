@@ -36,10 +36,9 @@ class karyawanController extends Controller
         // Tambahkan informasi lama kerja ke dalam data karyawan
         $data->lama_kerja = $lamaKerja;
 
-
-        // pemanggilan data table penilaian
-        $dataKaryawan = data_karyawan::where('nik', $nik)->firstOrFail();
-        $dataPenilaian = $dataKaryawan->penilaians;
+        // pemanggilan data untuk di table penilaian
+        $dataPenilaian = $data->penilaians;
+        //$dataPenilaian->tglpenilaian = Carbon::parse($data->tgl_penilaian)->format('d - F - Y');;
 
         // pemanggilan data untuk chartjs
         $dataPenilaianForChart = [];

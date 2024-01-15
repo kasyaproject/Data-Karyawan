@@ -18,18 +18,27 @@ class penilaianController extends Controller
     //view halaman form penilaian data karyawan
     public function form($nik)
     {
-        $data = data_karyawan::with('image')->where('nik', $nik)->first();
+        // cek jika ada penilaian yang belum di verifikasi 
+        $cek_penilaian = form_penilaian::where('nik_karyawan', $nik)->where('verifikasi', 'no')->first();
 
-        $penilai = Auth::user();
+        if ($cek_penilaian) {
+            // kembali ke halaman dengan pesan
+            return redirect()->route('detail', ['nik' => $nik])->with('error', 'Penilaian sedang menunggu Verifikasi.');
+        } else {
+            // jika penilaian yang sudah di verifikasi
+            $data = data_karyawan::with('image')->where('nik', $nik)->first();
 
-        // Hitung lama kerja dalam tahun dan bulan
-        $tanggalMasuk = Carbon::parse($data->mulaikerja);
-        $lamaKerja = $tanggalMasuk->diff(Carbon::now())->format('%y Tahun %m Bulan');
+            $penilai = Auth::user();
 
-        // Tambahkan informasi lama kerja ke dalam data karyawan
-        $data->lama_kerja = $lamaKerja;
+            // Hitung lama kerja dalam tahun dan bulan
+            $tanggalMasuk = Carbon::parse($data->mulaikerja);
+            $lamaKerja = $tanggalMasuk->diff(Carbon::now())->format('%y Tahun %m Bulan');
 
-        return view('penilaian.form', compact('data', 'penilai'));
+            // Tambahkan informasi lama kerja ke dalam data karyawan
+            $data->lama_kerja = $lamaKerja;
+
+            return view('penilaian.form', compact('data', 'penilai'));
+        }
     }
 
     //menyimpan hasil penilaian ke database
@@ -154,11 +163,46 @@ class penilaianController extends Controller
         $analisis->kebutuhan = $request->input('kebutuhan');
         $analisis->rekomendasi = $request->input('rekomendasi');
         $analisis->catatan = $request->input('catatan');
-        // Menghitung nilai kelebihan dan kekurangan
-        $nilaikelebihan = count($selectedKelebihan) * 10; // Menambah 10 poin untuk setiap kelebihan
 
-        $nilaikekurangan = 100 - (count($selectedKekurangan) * 10); // Mengurangkan 10 poin untuk setiap kekurangan
+        // Bobot untuk kelebihan
+        $bobotKelebihan = [
+            'Kemampuan Berkomunikasi' => 9,
+            'Kreativitas & Inovasi' => 8,
+            'Kerja Tim Solid' => 9,
+            'Pemecahan Masalah' => 11,
+            'Inisiatif & Proaktif' => 12,
+            'Kemampuan Analisis' => 11,
+            'Pengelolaan Waktu' => 8,
+            'Kepemimpinan' => 12,
+            'Keterampilan Teknis' => 10,
+            'Keandalan' => 10,
+        ];
 
+        // Bobot untuk kekurangan
+        $bobotKekurangan = [
+            'Ketidaktepatan Pekerjaan' => 10,
+            'Kurang Kemauan Belajar' => 9,
+            'Rendah Produktivitas' => 10,
+            'Kurang Komitmen' => 9,
+            'Kurang Berinisiatif' => 9,
+            'Sulit Tangani Kritik' => 8,
+            'Tidak Kuat Tekanan' => 8,
+            'Kurang Kolaborasi' => 9,
+            'Ketidaktaatan Aturan' => 10,
+            'Ketidakefisienan Tugas' => 8,
+        ];
+
+        // Menghitung nilai kelebihan
+        $nilaikelebihan = 0;
+        foreach ($selectedKelebihan as $kelebihan) {
+            $nilaikelebihan += $bobotKelebihan[$kelebihan];
+        }
+
+        // Menghitung nilai kekurangan
+        $nilaikekurangan = 100;
+        foreach ($selectedKekurangan as $kekurangan) {
+            $nilaikekurangan -= $bobotKekurangan[$kekurangan];
+        }
         // Menyimpan hasil kelebihan dan hasil kekurangan ke dalam objek
         $analisis->hasil_kelebihan = $nilaikelebihan;
         $analisis->hasil_kekurangan = $nilaikekurangan;
@@ -206,8 +250,6 @@ class penilaianController extends Controller
             $AKekurangan[$item['him']] = $item['a'];
         }
         // Membuat semua probilitas Aturan dari himpunan yang dipakai ( INFERENSI )
-        $minProbabilitas = null; // Initialize with null to find the minimum
-        $minProbabilitasHim = null; // Initialize with null to store the 'him' associated with the minimum 'a'
         foreach ($penilaian_grafik as $penilaian) {
             foreach ($kerajinan_grafik as $kerajinan) {
                 foreach ($kelebihan_grafik as $kelebihan) {
@@ -246,15 +288,14 @@ class penilaianController extends Controller
             $min_probabilitas = $data['min_probabilitas'];
 
             // Lakukan perhitungan berdasarkan output_rule dan min_probabilitas
-            $hasil = 0; // Inisialisasi hasil perhitungan
             if ($output_rule == 'buruk') {
-                $z = ($min_probabilitas * (45 - 40)) + 40;
+                $z = 60 - ($min_probabilitas * (60 - 50)); // linier Turun
             } elseif ($output_rule == 'cukup_baik') {
-                $z = ($min_probabilitas * (65 - 60)) + 60;
+                $z = 70 - ($min_probabilitas * (70 - 60)); // linier Turun
             } elseif ($output_rule == 'baik') {
-                $z = ($min_probabilitas * (80 - 65)) + 65;
+                $z = 80 - ($min_probabilitas * (80 - 70)); // linier Turun
             } elseif ($output_rule == 'sangat_baik') {
-                $z = ($min_probabilitas * (100 - 85)) + 85;
+                $z = ($min_probabilitas * (100 - 80)) + 80; // linier Naik
             }
 
             // Tambahkan hasil perhitungan ke dalam array
@@ -290,29 +331,24 @@ class penilaianController extends Controller
             $defuzzyfikasi = 0; // Atasi potensi pembagian oleh nol
         }
 
-        // Tentukan nilai berdasarkan rentang nilai defuzzyfikasi
-        if ($defuzzyfikasi >= 90 && $defuzzyfikasi <= 100) {
-            $nilai = 'A';
-        } elseif ($defuzzyfikasi >= 80 && $defuzzyfikasi < 90) {
-            $nilai = 'A-';
-        } elseif ($defuzzyfikasi >= 70 && $defuzzyfikasi < 80) {
-            $nilai = 'B';
-        } elseif ($defuzzyfikasi >= 60 && $defuzzyfikasi < 70) {
-            $nilai = 'B-';
-        } elseif ($defuzzyfikasi >= 50 && $defuzzyfikasi < 60) {
-            $nilai = 'C';
-        } elseif ($defuzzyfikasi >= 40 && $defuzzyfikasi < 50) {
-            $nilai = 'C-';
-        } elseif ($defuzzyfikasi >= 30 && $defuzzyfikasi < 40) {
-            $nilai = 'D';
-        } elseif ($defuzzyfikasi >= 20 && $defuzzyfikasi < 30) {
-            $nilai = 'D-';
-        } elseif ($defuzzyfikasi >= 10 && $defuzzyfikasi < 20) {
-            $nilai = 'E';
-        } elseif ($defuzzyfikasi >= 0 && $defuzzyfikasi < 10) {
-            $nilai = 'F';
-        } else {
-            $nilai = 'Tidak Terdefinisi';
+        // Masukan point dari defuzzyfikasi ke dalam grafik Hasil(Output)
+        $output_grafik = $this->grafik3($defuzzyfikasi);
+
+        // Simpan hasil dari grafik ke dalam array
+        $hasil = [];
+        foreach ($output_grafik as $item) {
+            $hasil[$item['him']] = $item['a'];
+        }
+
+        // Bandingkan himpunan dari variabel outpu yang tercipta
+        $nilaiTerbesar = 0;
+        $himTerbesar = '';
+
+        foreach ($hasil as $him => $nilai) {
+            if ($nilai > $nilaiTerbesar) {
+                $nilaiTerbesar = $nilai;
+                $himTerbesar = $him;
+            }
         }
 
         // Simpan data ke database
@@ -330,7 +366,8 @@ class penilaianController extends Controller
         $fuzzy->kekurangan_a = json_encode($kekurangan_a);
         $fuzzy->output = json_encode($allRuleOutputs);
         $fuzzy->point = $defuzzyfikasi; // point fuzzy
-        $fuzzy->nilai = $nilai;         // point dalam huruf
+        $fuzzy->persentase = $defuzzyfikasi; // point persentase
+        $fuzzy->nilai = $himTerbesar;         // point dalam himpunan variabel output
         $fuzzy->save();
 
         // Kembali ke view detail karawan setelah penilaian disimpan
@@ -553,6 +590,95 @@ class penilaianController extends Controller
         }
         return $himpunan;
     }
+    //////////////// Fungsi keanggotaan untuk variabel Hasil ( Output ) /////////////////////////////////////////////////////
+    private function grafik3($value)
+    {
+        $himpunan = [];
+
+        // Himpunan Rendah ( 0 - 60 )
+        if ($value <= 50) { // 0 - 50
+            $a = 1;
+            $him = "BR";
+        } elseif ($value > 50 && $value < 60) { // 50 - 60
+            $a = ($value - 50) / (60 - 50);
+            $him = "BR";
+        } else { // 60 - 100
+            $a = 0;
+            $him = "";
+        }
+
+        if (!empty($him)) {
+            $himpunan[] = [
+                "a" => $a,
+                "him" => $him,
+                "value" => $value,
+            ];
+        }
+        // Himpunan Cukup Baik ( 50 - 70 )
+        if ($value > 50 && $value < 60) { // 50 - 60
+            $a = ($value - 50) / (60 - 50);
+            $him = "CB";
+        } elseif ($value >= 60 && $value < 70) { // 60 - 70
+            $a = (70 - $value) / (70 - 60);
+            $him = "CB";
+        } elseif ($value == 60) { // 60
+            $a = 1;
+            $him = "CB";
+        } else { // selain 50 - 70
+            $a = 0;
+            $him = "";
+        }
+
+        if (!empty($him)) {
+            $himpunan[] = [
+                "a" => $a,
+                "him" => $him,
+                "value" => $value,
+            ];
+        }
+        // Himpunan Baik ( 60 - 80 )
+        if ($value <= 60 && $value >= 80) { // selain 60 - 80
+            $a = 0;
+            $him = "";
+        } elseif ($value > 60 && $value < 70) { // 60 - 70
+            $a = ($value - 60) / (70 - 60);
+            $him = "BA";
+        } elseif ($value > 70 && $value < 80) { // 70 - 80
+            $a = (80 - $value) / (80 - 70);
+            $him = "BA";
+        } elseif ($value == 70) { // 70
+            $a = 1;
+            $him = "BA";
+        }
+
+        if (!empty($him)) {
+            $himpunan[] = [
+                "a" => $a,
+                "him" => $him,
+                "value" => $value,
+            ];
+        }
+        // Himpunan Sangat Baik ( 70 - 100 )
+        if ($value <= 70) { // 0 - 70
+            $a = 0;
+            $him = "";
+        } elseif ($value > 70 && $value < 80) { // 70 - 80
+            $a = ($value - 70) / (80 - 70);
+            $him = "SB";
+        } elseif ($value >= 80) { // 60 - 100
+            $a = 1;
+            $him = "SB";
+        }
+
+        if (!empty($him)) {
+            $himpunan[] = [
+                "a" => $a,
+                "him" => $him,
+                "value" => $value,
+            ];
+        }
+        return $himpunan;
+    }
     ////////// MEMBUAT ATURAN DENGAN LOOPING //////////////////////////
     public function store_rule_view()
     {
@@ -615,10 +741,10 @@ class penilaianController extends Controller
     ////////// TEST PERHITUNGAN FUZZY /////////////////////////////////////
     public function showtest(Request $request)
     {
-        $nilai_penilaian = 71;
+        $nilai_penilaian = 74.4;
         $nilai_kerajinan = 81;
-        $nilai_kelebihan = 10;
-        $nilai_kekurangan = 90;
+        $nilai_kelebihan = 66;
+        $nilai_kekurangan = 64;
 
         $pembagian = ($nilai_penilaian + $nilai_kerajinan + $nilai_kelebihan + $nilai_kekurangan) / 4;
 
@@ -699,14 +825,14 @@ class penilaianController extends Controller
 
             // Lakukan perhitungan berdasarkan output_rule dan min_probabilitas
             $hasil = 0; // Inisialisasi hasil perhitungan
-            if ($output_rule == 'rendah') {
-                $z = ($min_probabilitas * (45 - 40)) + 40;
+            if ($output_rule == 'buruk') {
+                $z = 60 - ($min_probabilitas * (60 - 50)); // linier Turun
             } elseif ($output_rule == 'cukup_baik') {
-                $z = ($min_probabilitas * (65 - 60)) + 60;
+                $z = 70 - ($min_probabilitas * (70 - 60)); // linier Turun
             } elseif ($output_rule == 'baik') {
-                $z = ($min_probabilitas * (80 - 65)) + 65;
+                $z = 80 - ($min_probabilitas * (80 - 70)); // linier Turun
             } elseif ($output_rule == 'sangat_baik') {
-                $z = ($min_probabilitas * (100 - 85)) + 85;
+                $z = ($min_probabilitas * (100 - 80)) + 80; // linier Naik
             }
 
             // Tambahkan hasil perhitungan ke dalam array
@@ -741,36 +867,27 @@ class penilaianController extends Controller
             $defuzzyfikasi = 0; // Atasi potensi pembagian oleh nol
         }
 
-        // Tentukan nilai berdasarkan rentang nilai defuzzyfikasi
-        if ($defuzzyfikasi >= 90 && $defuzzyfikasi <= 100) {
-            $nilai = 'A';
-        } elseif ($defuzzyfikasi >= 80 && $defuzzyfikasi < 90) {
-            $nilai = 'A-';
-        } elseif ($defuzzyfikasi >= 70 && $defuzzyfikasi < 80) {
-            $nilai = 'B';
-        } elseif ($defuzzyfikasi >= 60 && $defuzzyfikasi < 70) {
-            $nilai = 'B-';
-        } elseif ($defuzzyfikasi >= 50 && $defuzzyfikasi < 60) {
-            $nilai = 'C';
-        } elseif ($defuzzyfikasi >= 40 && $defuzzyfikasi < 50) {
-            $nilai = 'C-';
-        } elseif ($defuzzyfikasi >= 30 && $defuzzyfikasi < 40) {
-            $nilai = 'D';
-        } elseif ($defuzzyfikasi >= 20 && $defuzzyfikasi < 30) {
-            $nilai = 'D-';
-        } elseif ($defuzzyfikasi >= 10 && $defuzzyfikasi < 20) {
-            $nilai = 'E';
-        } elseif ($defuzzyfikasi >= 0 && $defuzzyfikasi < 10) {
-            $nilai = 'F';
-        } else {
-            $nilai = 'Tidak Terdefinisi';
+        $input  = 72.3987;
+        // Masukan point dari defuzzyfikasi ke dalam grafik Hasil(Output)
+        $output_grafik = $this->grafik3($input);
+
+        // Simpan hasil dari grafik ke dalam array
+        $hasil = [];
+        foreach ($output_grafik as $item) {
+            $hasil[$item['him']] = $item['a'];
         }
 
-        //
-        $hasil = $defuzzyfikasi;
+        // Bandingkan himpunan dari variabel outpu yang tercipta
+        $nilaiTerbesar = 0;
+        $himTerbesar = '';
 
-        //$penilaian = $penilaian_him;
+        foreach ($hasil as $him => $nilai) {
+            if ($nilai > $nilaiTerbesar) {
+                $nilaiTerbesar = $nilai;
+                $himTerbesar = $him;
+            }
+        }
 
-        return view('test', compact('fuzzyfikasi', 'probilitas', 'inferensi', 'hasil', 'nilai', 'penilaian', 'pembagian'));
+        return view('test', compact('fuzzyfikasi', 'himTerbesar', 'nilaiTerbesar', 'hasil', 'probilitas', 'inferensi', 'penilaian', 'pembagian', 'defuzzyfikasi', 'defuzzyfikasi_numerator', 'defuzzyfikasi_denominator'));
     }
 }

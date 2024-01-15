@@ -46,7 +46,12 @@
 
     <h1>DEFFUZYFIKASI</h1>
 
-    <p>Hasil defuzzyfikasi: {{ $hasil }} / {{ $nilai }}</p>
-    <p>Pembagian biasa: {{ $pembagian }}</p>
+    <p>Hasil atas: {{ $defuzzyfikasi_numerator }} </p>
+    <p>Hasil bawah: {{ $defuzzyfikasi_denominator }} </p>
+    <p>Hasil pembagian: {{ $defuzzyfikasi }} </p>
+    @foreach($hasil as $him => $nilaiA)
+        <p>{{ $him }}: {{ $nilaiA }}</p>
+    @endforeach
+    <p>Hasil Akhir: {{ $himTerbesar }} dengan point {{ $nilaiTerbesar }}</p>
 </body>
 </html>

@@ -38,7 +38,7 @@ class rangkingController extends Controller
 
         // Mengurutkan data karyawan berdasarkan poin terbesar
         $data = $data->sortByDesc(function ($karyawan) {
-            return optional($karyawan->penilaians->first())->formFuzzy->point ?? 0;
+            return optional($karyawan->penilaians->first())->formFuzzy->persentase ?? 0;
         });
 
         return view('rangking.lihat', compact('data', 'penilaian'));

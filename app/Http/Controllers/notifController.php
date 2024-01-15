@@ -24,15 +24,12 @@ class notifController extends Controller
     //ubah verifikasi no menjadi yes
     public function update(Request $request, $nik)
     {
-        $data = form_penilaian::where('nik_karyawan', $nik)->first();
+        $data = form_penilaian::where('nik_karyawan', $nik)->where('verifikasi', 'no')->first();
 
         // Ubah nilai kolom "verifikasi" menjadi "yes"
         $data->verifikasi = 'yes';
-
-        // Simpan perubahan
         $data->save();
 
-        // Tambahkan pesan sukses atau logika lainnya yang Anda inginkan
         return redirect()->back();
     }
 }

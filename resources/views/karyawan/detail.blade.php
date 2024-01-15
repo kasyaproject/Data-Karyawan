@@ -95,7 +95,7 @@
             <div class="bg-blue- rounded-r-md h-full p-4">
               <!-- Tempatkan grafik di sini -->
               <div id="grafik" class="h-full bg-gray- rounded-md">
-                <p class="text-xl bg-blue- px-4 font-extrabold text-center">Grafik Kinerja SDI</p>
+                <p class="text-xl bg-blue- px-4 font-extrabold text-center">Grafik Kinerja SDM</p>
                 <canvas id="lineChart"></canvas>
               </div>
             </div>
@@ -123,7 +123,7 @@
                 <th class="border p-2 w-20">point Kerajinan</th>
                 <th class="border p-2 w-56">Kelebihan</th>
                 <th class="border p-2 w-56">Kekurangan</th>
-                <th class="border p-2 w-28">Point Total</th>
+                <th class="border p-2 w-28">Hasil Nilai</th>
                 <th class="border p-2 w-32 text-center"><i class="bi bi-pencil-square"></i></th>
               </tr>
             </thead>
@@ -374,7 +374,17 @@
                                   <!-- Lihat Aturan END -->
                                   <!-- Lihat Deffuzyfikasi -->
                                   <div class="w-full my-2 pb-6 border-b-2">
-                                    <p class="text-lg">Output = ∑(ai x z) / ∑(ai) = <label class="font-bold text-xl">{{ $penilaian->formFuzzy->point }} / {{ $penilaian->formFuzzy->nilai }}</label></p>
+                                    <p class="text-lg">Output = ∑(ai x z) / ∑(ai) = <label class="font-bold text-xl">{{ $penilaian->formFuzzy->persentase }} / 
+                                      @if($penilaian->formFuzzy->nilai == 'BR')
+                                        Rendah
+                                      @elseif($penilaian->formFuzzy->nilai == 'CB')
+                                        Cukup Baik
+                                      @elseif($penilaian->formFuzzy->nilai == 'BA')
+                                        Baik
+                                      @elseif($penilaian->formFuzzy->nilai == 'SB')
+                                        Sangat Baik
+                                      @endif
+                                    </label></p>
                                   </div>
                                   <!-- Lihat Deffuzyfikasi END -->
                                 </div>
@@ -475,7 +485,7 @@
                                   <div class="border-b-2 pb-4">
                                     <div class="w-full">
                                       <div class="w-full mb-4 group">
-                                        <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian dengan SDI</label>  
+                                        <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian dengan SDM</label>  
                                         <textarea for="rangkuman" 
                                         type="text" name="rangkuman"
                                         class="w-full h-32 max-h-max px-4 py-2 rounded-md resize-none" required>{{ $penilaian->formAnalisis->rangkuman }}</textarea>
@@ -517,8 +527,16 @@
                         <div class="flex flex-col items-center w-full md:w-[30%]">
                           <h1 class="text-2xl border-b-2 font-semibold mb-4 text-gray-600">Point Total</h1>
                           <div class="flex flex-col h-44 w-44 rounded-full items-center border-8 border-blue-400">
-                              <p class="text-7xl font-semibold ml-6 mt-10 text-gray-600">{{ $penilaian->formFuzzy->point }}<label class="text-3xl">/{{ $penilaian->formFuzzy->nilai }}</label></p>
-                              <p class="text-xl font-semibold pt-2 text-gray-600">Point</p>
+                              <p class="text-6xl font-semibold mt-10 text-gray-600">{{ $penilaian->formFuzzy->point }}</p>
+                              @if($penilaian->formFuzzy->nilai == 'BR')
+                                <p class="text-xl font-semibold pt-2 text-gray-600">Rendah</p>
+                              @elseif($penilaian->formFuzzy->nilai == 'CB')
+                                <p class="text-xl font-semibold pt-2 text-gray-600">Cukup Baik</p>
+                              @elseif($penilaian->formFuzzy->nilai == 'BA')
+                                <p class="text-xl font-semibold pt-2 text-gray-600">Baik</p>
+                              @elseif($penilaian->formFuzzy->nilai == 'SB')
+                                <p class="text-xl font-semibold pt-2 text-gray-600">Sangat Baik</p>
+                              @endif
                           </div>
                         </div>                    
                         <!-- POINT / NILAI END -->                
@@ -581,6 +599,7 @@
           $('#tabel-akun').DataTable({
             lengthChange: false,
             searching: false,
+            order: [[0, 'desc']],
             columnDefs: [
                 { targets: [7], orderable: false },
             ]
@@ -590,46 +609,58 @@
     <!-- SCRIPT DATATABLE END-->
 
     <!-- SCRIPT DIAGRAM -->
-      <script>
-        // Ambil data dari dataPenilaianForChart
-        const dataPenilaianForChart = @json($dataPenilaianForChart);
-
-        // Konversi data menjadi format yang sesuai untuk Chart.js
-        const chartLabels = [];
-        const chartDataPoint = [];
-
-        dataPenilaianForChart.forEach(item => {
-            chartLabels.push(item.tgl_penilaian);
-            chartDataPoint.push(item.point);
-        });
-
-        const ctx = document.getElementById('lineChart').getContext('2d');
-
-        const lineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: 'Point Penilaian',
-                    data: chartDataPoint,
-                    borderColor: 'blue',
-                    borderWidth: 2,
-                    radius: 6,
-                    tension: 0.4,
-                    backgroundColor: 'rgba(0, 255, 0, 0.1)',
-                    fill: 'start', // Memulai garis dari nilai 0
-                }],
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                    },
-                },
-            },
-        });
-      </script>
+    <script>
+      // Ambil data dari dataPenilaianForChart
+      const dataPenilaianForChart = @json($dataPenilaianForChart);
+  
+      // Urutkan data berdasarkan tanggal penilaian (tgl_penilaian)
+      dataPenilaianForChart.sort((a, b) => new Date(a.tgl_penilaian) - new Date(b.tgl_penilaian));
+  
+      // Konversi data menjadi format yang sesuai untuk Chart.js
+      const chartLabels = [];
+      const chartDataPoint = [];
+  
+      dataPenilaianForChart.forEach(item => {
+          chartLabels.push(item.tgl_penilaian);
+          chartDataPoint.push(item.point);
+      });
+  
+      const ctx = document.getElementById('lineChart').getContext('2d');
+  
+      const lineChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+              labels: chartLabels,
+              datasets: [{
+                  label: 'Point Penilaian',
+                  data: chartDataPoint,
+                  borderColor: 'blue',
+                  borderWidth: 2,
+                  radius: 6,
+                  tension: 0.4,
+                  backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                  fill: 'start',
+              }],
+          },
+          options: {
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      max: 100,
+                  },
+              },
+              plugins: {
+                  tooltip: {
+                      callbacks: {
+                          title: (tooltipItem) => tooltipItem[0].label,
+                          label: (tooltipItem) => `Nilai: ${tooltipItem.formattedValue}`,
+                      },
+                  },
+              },
+          },
+      });
+  </script>
+  
     <!-- SCRIPT DIAGRAM END -->
 
     @endsection

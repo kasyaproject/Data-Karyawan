@@ -72,8 +72,8 @@
         <!-- Form Penilaian Karyawan -->
           <div class="bg-white p-4 m-2 rounded-lg shadow-md">
             <div class="px-4 pb-2 border-b-2">
-              <label class="font-bold text-xl ">Form Penilaian SDI</label>
-              <p class="w-2/3 text-gray-600">Form penilaian SDI dibuat untuk menilai kinerja SDI yang dilakukan oleh atasan, dimana penilaian dilakukan secara subjektif. penilaian ini dilakukan dengan point dimulai dari 1 - 100 point yang menunjukan kinerja SDI tersebut.</p>
+              <label class="font-bold text-xl ">Form Penilaian SDM</label>
+              <p class="w-2/3 text-gray-600">Form penilaian SDM dibuat untuk menilai kinerja SDM yang dilakukan oleh atasan, dimana penilaian dilakukan secara subjektif. penilaian ini dilakukan dengan point dimulai dari 1 - 100 point yang menunjukan kinerja SDM tersebut.</p>
             </div>
 
             <div class="grid md:grid-cols-2 md:gap-6 px-8 pt-8">
@@ -126,7 +126,7 @@
           <div class="bg-white m-2 p-4 rounded-lg shadow-md">
             <div class="px-4 pb-2 border-b-2">
               <label class="font-bold text-xl ">Form Kerajinan</label>
-              <p class="w-2/3 text-gray-600">Identifikasikan tingkat kehadiran dan juga pelanggaran jam kerja dari SDI yang anda nilai.</p>
+              <p class="w-2/3 text-gray-600">Identifikasikan tingkat kehadiran dan juga pelanggaran jam kerja dari SDM yang anda nilai.</p>
             </div>
 
             <div class="grid md:grid-cols-2 md:gap-6 px-8 pt-8">
@@ -167,7 +167,7 @@
           <div class="bg-white m-2 p-4 rounded-lg shadow-md">
             <div class="px-4 pb-2 border-b-2">
               <label class="font-bold text-xl ">Form Analisis Kekuatan dan Kelemahan</label>
-              <p class="w-2/3 text-gray-600">Identifikasikan kekuatan dan kelemahan dari SDI yang anda nilai. Dan kemukakan perkembangan apa yang anda inginkan untuk SDI tersebut pada periode mendatang.</p>
+              <p class="w-2/3 text-gray-600">Identifikasikan kekuatan dan kelemahan dari SDM yang anda nilai. Dan kemukakan perkembangan apa yang anda inginkan untuk SDM tersebut pada periode mendatang.</p>
             </div>
             <!-- Kelebihan & Kekurangan-->
             <div class="mt-2">
@@ -208,7 +208,7 @@
             <!-- Rangkuman -->
             <div class="w-full px-8">
               <div class="w-full mb-4 group">
-                <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian ini dengan SDI yang dinilai</label>  
+                <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian ini dengan SDM yang dinilai</label>  
                 <textarea for="rangkuman" 
                 type="text" name="rangkuman"
                 class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
@@ -225,7 +225,7 @@
                   class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
                 </div>
                 <div class="w-full mb-4 group">
-                  <label for="rekomendasi" class="block text-gray-600 text-sm mb-2">Rekomendasi Terhadap SDI ini</label>  
+                  <label for="rekomendasi" class="block text-gray-600 text-sm mb-2">Rekomendasi Terhadap SDM ini</label>  
                   <textarea for="rekomendasi" 
                   type="text" name="rekomendasi"
                   class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
