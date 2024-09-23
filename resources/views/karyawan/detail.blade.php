@@ -117,12 +117,11 @@
           <table id="tabel-akun" class="w-full border-collapse mb-4">
             <thead class="bg-blue-400 text-white">
               <tr class="text-center text-sm">
-                <th class="border p-2 w-28">Tanggal Penilaian</th>
+                <th class="border p-2 w-32">Tanggal Penilaian</th>
                 <th class="border p-2 w-32">Nama Penilaian</th>
-                <th class="border p-2 w-20">Point Penilaian</th>
-                <th class="border p-2 w-20">point Kerajinan</th>
-                <th class="border p-2 w-56">Kelebihan</th>
-                <th class="border p-2 w-56">Kekurangan</th>
+                <th class="border p-2 w-28">Point Absensi</th>
+                <th class="border p-2 w-52">Jumlah Produktifitas</th>
+                <th class="border p-2 w-52">Kepuasan Customer</th>
                 <th class="border p-2 w-28">Hasil Nilai</th>
                 <th class="border p-2 w-32 text-center"><i class="bi bi-pencil-square"></i></th>
               </tr>
@@ -132,19 +131,10 @@
                   <tr class="text-sm">
                       <td class="border p-2">{{ $penilaian->tgl_penilaian }}</td>
                       <td class="border p-2">{{ $penilaian->nama_penilai }}</td>
-                      <td class="border p-2">{{ $penilaian->hasil }}</td>
-                      <td class="border p-2">{{ $penilaian->formKerajinan->hasil }}</td>
-                      <td class="border p-2 align-text-top text-left">
-                        @foreach(json_decode($penilaian->formAnalisis->kelebihan) ?? [] as $kelebihan)
-                          <label class="text-xs bg-blue-200 text-blue-600 border-blue-600 border-1 rounded-full p-0.5 px-2 m-0.5"> {{ $kelebihan }}</label>
-                        @endforeach
-                      </td>
-                      <td class="border p-2 align-text-top text-left">
-                        @foreach(json_decode($penilaian->formAnalisis->kekurangan) ?? [] as $kekurangan)
-                          <label class="text-xs bg-blue-200 text-blue-600 border-blue-600 border-1 rounded-full p-0.5 px-2 m-0.5"> {{ $kekurangan }}</label>
-                        @endforeach
-                      </td>
-                      <td class="border p-2"> {{ $penilaian->formFuzzy->point }} / {{ $penilaian->formFuzzy->nilai }} 
+                      <td class="border p-2">{{ $penilaian->detail->hasil_absensi }}</td>
+                      <td class="border p-2">{{ $penilaian->detail->produktifitas }}</td>                      
+                      <td class="border p-2">{{ $penilaian->detail->cust_relation }}</td>                      
+                      <td class="border p-2"><p>{{ $penilaian->fuzzy->probabilitas }}</p><label>{{ $penilaian->fuzzy->probabilitas_him }}</label>
                           @if ($penilaian->verifikasi === 'yes')
                             <i class="bi bi-patch-check-fill text-green-500 ml-2" title="Penilaian sudah di Verifikasi"></i>
                           @elseif ($penilaian->verifikasi === 'no') 
@@ -152,10 +142,10 @@
                           @endif
                       </td>
                       <td class="border p-2 text-center">
-                        <button data-modal-target="staticModal-{{ $penilaian->id }}" data-modal-toggle="staticModal-{{ $penilaian->id }}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded">
+                        <button data-modal-target="staticModal-{{ $penilaian->id_penilaian }}" data-modal-toggle="staticModal-{{ $penilaian->id_penilaian }}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded">
                           <i class="bi bi-eye"></i>
                         </button>
-                        <button data-modal-target="popup-modal-{{ $penilaian->id }}" data-modal-toggle="popup-modal-{{ $penilaian->id }}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded" 
+                        <button data-modal-target="popup-modal-{{ $penilaian->id_penilaian }}" data-modal-toggle="popup-modal-{{ $penilaian->id_penilaian }}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded" 
                         type="button">
                           <i class="bi bi-trash"></i>
                         </button>
@@ -170,7 +160,7 @@
     <!-- MODAL -->
       <!-- MODAL DETAIL -->
         @foreach ($dataPenilaian as $penilaian)
-          <div id="staticModal-{{ $penilaian->id }}" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+          <div id="staticModal-{{ $penilaian->id_penilaian }}" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative w-full max-w-4xl max-h-full">
                 <!-- Modal content -->
                   <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -182,7 +172,7 @@
                             </h3>
                             <p class="text-base font-semibold text-gray-500">{{ $penilaian->tgl_penilaian }}</p>
                           </div>
-                          <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="staticModal-{{ $penilaian->id }}">
+                          <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="staticModal-{{ $penilaian->id_penilaian }}">
                               <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                               </svg>
@@ -191,7 +181,7 @@
                       </div>
                       <!-- Modal body -->
                       <div class="flex flex-wrap px-4 py-2">
-                        <div class="relative bg-slate-00 w-full md:w-[70%] border-">
+                        <div class="relative bg-slate-00 w-full md:w-[70%]">
                           <div id="indicators-carousel" class="relative w-full" data-carousel="static">
                             <!-- Carousel wrapper -->
                             <div class="relative h-56 overflow-hidden rounded-lg md:h-96">
@@ -211,128 +201,81 @@
                                         </thead>
                                         <tbody class="text-center text-gray-500">
                                           <tr>
-                                            <td class="w-36">Penilaian</td>
-                                            <td class="w-20">{{ $penilaian->hasil }}</td>
+                                            <td class="w-36">Absensi</td>
+                                            <td class="w-20">{{ $penilaian->detail->hasil_absensi }}</td>
                                             <td class="w-full flex justify-center items-center flex-wrap">
-                                              @foreach (json_decode($penilaian->formFuzzy->penilaian_him) ?? [] as $index => $penilaian_him)
+                                              @foreach (json_decode($penilaian->fuzzy->absensi_him) ?? [] as $index => $absensi_him)
                                                   @php
-                                                      $penilaian_a = json_decode($penilaian->formFuzzy->penilaian_a)[$index] ?? null;                                             
+                                                      $absensi_a = json_decode($penilaian->fuzzy->absensi_a)[$index] ?? null;                                             
                                                   @endphp
                                               
-                                                  @if ($penilaian_him === 'buruk')
+                                                  @if ($absensi_him === 'Kurang')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-red-400">
-                                                          Buruk ({{ $penilaian_a ?? 0 }})
+                                                          Kurang ({{ $absensi_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($penilaian_him === 'cukup_baik')
+                                                  @if ($absensi_him === 'Cukup')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-yellow-400">
-                                                          Cukup Baik ({{ $penilaian_a ?? 0 }})
+                                                          Cukup ({{ $absensi_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($penilaian_him === 'baik')
+                                                  @if ($absensi_him === 'Bagus')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-green-400">
-                                                          Baik ({{ $penilaian_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($penilaian_him === 'sangat_baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-blue-400">
-                                                          Sangat Baik ({{ $penilaian_a ?? 0 }})
+                                                          Bagus ({{ $absensi_a ?? 0 }})
                                                       </p>
                                                   @endif
                                               @endforeach                                            
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td class="w-24">Kerjaninan</td>
-                                            <td class="w-12">{{ $penilaian->formKerajinan->hasil }}</td>
+                                            <td class="w-24">Produktifitas</td>
+                                            <td class="w-12">{{ $penilaian->detail->produktifitas }}</td>
                                             <td class="w-full flex justify-center items-center flex-wrap">
-                                              @foreach (json_decode($penilaian->formFuzzy->kerajinan_him) ?? [] as $index => $kerajinan_him)
+                                              @foreach (json_decode($penilaian->fuzzy->produktifitas_him	) ?? [] as $index => $produktifitas_him	)
                                                   @php
-                                                      $kerajinan_a = json_decode($penilaian->formFuzzy->kerajinan_a)[$index] ?? null;                                             
+                                                      $produktif_a = json_decode($penilaian->fuzzy->produktifitas_a)[$index] ?? null;                                             
                                                   @endphp
                                               
-                                                  @if ($kerajinan_him === 'buruk')
+                                                  @if ($produktifitas_him === 'Kurang')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-red-400">
-                                                          Buruk ({{ $kerajinan_a ?? 0 }})
+                                                          Buruk ({{ $produktif_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($kerajinan_him === 'cukup_baik')
+                                                  @if ($produktifitas_him === 'Cukup')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-yellow-400">
-                                                          Cukup Baik ({{ $kerajinan_a ?? 0 }})
+                                                          Cukup Baik ({{ $produktif_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($kerajinan_him === 'baik')
+                                                  @if ($produktifitas_him === 'Bagus')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-green-400">
-                                                          Baik ({{ $kerajinan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($kerajinan_him === 'sangat_baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-blue-400">
-                                                          Sangat Baik ({{ $kerajinan_a ?? 0 }})
+                                                          Baik ({{ $produktif_a ?? 0 }})
                                                       </p>
                                                   @endif
                                               @endforeach                                                                                   
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td class="w-24">Kelebihan</td>
-                                            <td class="w-12">{{ $penilaian->formAnalisis->hasil_kelebihan }}</td>
+                                            <td class="w-24">Customer Relationship</td>
+                                            <td class="w-12">{{ $penilaian->detail->cust_relation }}</td>
                                             <td class="w-full flex justify-center items-center flex-wrap">
-                                              @foreach (json_decode($penilaian->formFuzzy->kelebihan_him) ?? [] as $index => $kelebihan_him)
+                                              @foreach (json_decode($penilaian->fuzzy->custrelation_him) ?? [] as $index => $custrelation_him)
                                                   @php
-                                                      $kelebihan_a = json_decode($penilaian->formFuzzy->kelebihan_a)[$index] ?? null;                                             
+                                                      $kelebihan_a = json_decode($penilaian->fuzzy->custrelation_a)[$index] ?? null;                                             
                                                   @endphp
                                               
-                                                  @if ($kelebihan_him === 'buruk')
+                                                  @if ($custrelation_him === 'Kurang')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-red-400">
                                                           Buruk ({{ $kelebihan_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($kelebihan_him === 'cukup_baik')
+                                                  @if ($custrelation_him === 'Cukup')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-yellow-400">
                                                           Cukup Baik ({{ $kelebihan_a ?? 0 }})
                                                       </p>
                                                   @endif
-                                                  @if ($kelebihan_him === 'baik')
+                                                  @if ($custrelation_him === 'Bagus')
                                                       <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-green-400">
                                                           Baik ({{ $kelebihan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($kelebihan_him === 'sangat_baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-blue-400">
-                                                          Sangat Baik ({{ $kelebihan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                              @endforeach
-                                            </td>
-                                          </tr>
-                                          <tr>
-                                            <td class="w-24">Kekurangan</td>
-                                            <td class="w-12">{{ $penilaian->formAnalisis->hasil_kekurangan }}</td>
-                                            <td class="w-full flex justify-center items-center flex-wrap">
-                                              @foreach (json_decode($penilaian->formFuzzy->kekurangan_him) ?? [] as $index => $kekurangan_him)
-                                                  @php
-                                                      $kekurangan_a = json_decode($penilaian->formFuzzy->kekurangan_a)[$index] ?? null;                                             
-                                                  @endphp
-                                              
-                                                  @if ($kekurangan_him === 'rendah')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-red-400">
-                                                          Buruk ({{ $kekurangan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($kekurangan_him === 'cukup_baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-yellow-400">
-                                                          Cukup Baik ({{ $kekurangan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($kekurangan_him === 'baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-green-400">
-                                                          Baik ({{ $kekurangan_a ?? 0 }})
-                                                      </p>
-                                                  @endif
-                                                  @if ($kekurangan_him === 'sangat_baik')
-                                                      <p class="ml-2 mt-2 px-2 py-0.5 text-sm text-white rounded-full bg-blue-400">
-                                                          Sangat Baik ({{ $kekurangan_a ?? 0 }})
                                                       </p>
                                                   @endif
                                               @endforeach
@@ -343,29 +286,33 @@
                                     </div>
                                   </div>   
                                   <!-- Lihat Detail perhitungan FUZZY END -->
+                                  
                                   <!-- Lihat Aturan -->
                                     <div class="w-full my-2 pb-2 border-b-2">
                                       <p>Probibilitas aturan yang tercipta : </p>
                                       @php
-                                          $penilaian_him = json_decode($penilaian->formFuzzy->penilaian_him) ?? [];
-                                          $kerajinan_him = json_decode($penilaian->formFuzzy->kerajinan_him) ?? [];
-                                          $kelebihan_him = json_decode($penilaian->formFuzzy->kelebihan_him) ?? [];
-                                          $kekurangan_him = json_decode($penilaian->formFuzzy->kekurangan_him) ?? [];
-                                          $output = json_decode($penilaian->formFuzzy->output) ?? [];
+                                          $absensi_him = json_decode($penilaian->fuzzy->absensi_him) ?? [];
+                                          $produktifitas_him = json_decode($penilaian->fuzzy->produktifitas_him) ?? [];
+                                          $custrelation_him = json_decode($penilaian->fuzzy->custrelation_him) ?? [];
+                                          $output = json_decode($penilaian->fuzzy->keputusan) ?? [];
                                           $n = 0;
                                       @endphp
 
-                                      @foreach ($penilaian_him as $pen)
-                                          @foreach ($kerajinan_him as $ker)
-                                              @foreach ($kelebihan_him as $kele)
-                                                  @foreach ($kekurangan_him as $kek)
-                                                      <!-- Tampilkan probabilitas aturan yang tercipta -->
-                                                      <div class="w-full py-1">
-                                                        <p>R{{ $n + 1; }}: jika Penilaian <label class="font-semibold uppercase">{{ $pen }}</label> dan Kinerja <label class="font-semibold uppercase">{{ $ker }}</label> dan Kelebihan <label class="font-semibold uppercase">{{ $kele }}</label> dan Kekurangan <label class="font-semibold uppercase">{{ $kek }}</label> maka Output <label class="font-semibold uppercase">{{ $output[$n] }}</label></p>
-                                                      </div>
-                                                      @php
-                                                          $n++;
-                                                      @endphp
+                                      @foreach ($absensi_him as $abs)
+                                          @foreach ($produktifitas_him as $pro)
+                                              @foreach ($custrelation_him as $cust)
+                                                  @foreach ($output as $out)
+                                                    <!-- Tampilkan probabilitas aturan yang tercipta -->
+                                                    <div class="w-full py-1">
+                                                      <p>R{{ $n + 1; }}: 
+                                                        jika Absensi <label class="font-semibold uppercase">{{ $abs }}</label> 
+                                                        dan Produktifitas <label class="font-semibold uppercase">{{ $pro }}</label> 
+                                                        dan Customer Relationship <label class="font-semibold uppercase">{{ $cust }}</label> 
+                                                        maka Keputusan <label class="font-semibold uppercase">{{ $out }}</label></p>
+                                                    </div>
+                                                     @php
+                                                       $n++;
+                                                     @endphp
                                                   @endforeach
                                               @endforeach
                                           @endforeach
@@ -374,151 +321,90 @@
                                   <!-- Lihat Aturan END -->
                                   <!-- Lihat Deffuzyfikasi -->
                                   <div class="w-full my-2 pb-6 border-b-2">
-                                    <p class="text-lg">Output = ∑(ai x z) / ∑(ai) = <label class="font-bold text-xl">{{ $penilaian->formFuzzy->persentase }} / 
-                                      @if($penilaian->formFuzzy->nilai == 'BR')
-                                        Rendah
-                                      @elseif($penilaian->formFuzzy->nilai == 'CB')
-                                        Cukup Baik
-                                      @elseif($penilaian->formFuzzy->nilai == 'BA')
-                                        Baik
-                                      @elseif($penilaian->formFuzzy->nilai == 'SB')
-                                        Sangat Baik
-                                      @endif
-                                    </label></p>
+                                    <p class="text-lg">Output = ∑(ai x z) / ∑(ai) = <label class="font-bold text-xl">{{ $penilaian->fuzzy->probabilitas }} / {{ $penilaian->fuzzy->probabilitas_him }}</label></p>
                                   </div>
                                   <!-- Lihat Deffuzyfikasi END -->
                                 </div>
                               <!-- Item 1  END -->
                               <!-- Item 2 -->
-                                <div class="hidden duration-700 ease-in-out p-2 overflow-auto mb-8" data-carousel-item="active">
+                                <div class="hidden duration-700 ease-in-out p-2 overflow-auto mb-8" data-carousel-item="">
                                   <!-- Lihat Detail perhitungan FUZZY -->
                                   <div class="flex flex-wrap">                                    
                                     <div class="w-full h-full border-b-2">
                                       <h1 class="text-xl font-semibold mx-2 mb-4 p-2 border-b-2">Detail Penilaian</h1>
+                                      {{-- Tabel Absensi --}}
                                       <table id="tabel-akun" class="w-full border-collapse mb-4">
                                         <thead class="bg-blue-400 text-white">
                                           <tr class="text-center text-sm">
                                             <th class="border p-2 w-20">Keterangan</th>
-                                            <th class="border p-2 w-32">Point</th>
+                                            <th class="border p-2 w-32">Jumlah</th>
                                           </tr>
                                         </thead>
                                         <tbody>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Kerajinan</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->kerajinan }}</th>
+                                            <th class="border p-2">Sakit (dg Surat Keterangan Dokter)</th>
+                                            <th class="border p-2 ">{{ $penilaian->detail->sakit }} hari</th>
                                           </tr>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Loyalitas</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->loyalitas }}</th>
+                                            <th class="border p-2">Izin / Sakit (Tanpa SKD)</th>
+                                            <th class="border p-2">{{ $penilaian->detail->izin }} hari</th>
                                           </tr>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Inisiatif</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->inisiatif }}</th>
+                                            <th class="border p-2">Tanpa Izin</th>
+                                            <th class="border p-2">{{ $penilaian->detail->tanpa_izin }} hari</th>
                                           </tr>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Kerja sama</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->kerjasama }}</th>
+                                            <th class="border p-2">Datang Terlambat</th>
+                                            <th class="border p-2">{{ $penilaian->detail->terlambat }} jam</th>
                                           </tr>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Integritas</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->integritas }}</th>
+                                            <th class="border p-2">Pulang Cepat</th>
+                                            <th class="border p-2">{{ $penilaian->detail->pulang_cepat }} jam</th>
+                                          </tr>  
+                                        </tbody>
+                                      </table> 
+
+                                      {{-- Tabel Produktifitas --}}
+                                      <table id="tabel-akun" class="w-full border-collapse mb-4">
+                                        <thead class="bg-blue-400 text-white">
+                                          <tr class="text-center text-sm">
+                                            <th class="border p-2 w-20">Keterangan</th>
+                                            <th class="border p-2 w-32">Jumlah</th>
                                           </tr>
+                                        </thead>
+                                        <tbody>
                                           <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">DQ Method</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->daqumethod }}</th>
-                                          </tr>
-                                          <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Custemer Relationship</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->custrelation }}</th>
-                                          </tr>
-                                          <tr class="text-center text-base">
-                                            <th class="border p-2 w-20">Kerapihan</th>
-                                            <th class="border p-2 w-32">{{ $penilaian->kerapihan }}</th>
+                                            <th class="border p-2">Produktifitas</th>
+                                            <th class="border p-2 ">{{ $penilaian->detail->produktifitas }} jumlah</th>
                                           </tr>
                                         </tbody>
-                                      </table>                                        
+                                      </table>  
+
+                                      {{-- Tabel Custrelation --}}
+                                      <table id="tabel-akun" class="w-full border-collapse mb-4">
+                                        <thead class="bg-blue-400 text-white">
+                                          <tr class="text-center text-sm">
+                                            <th class="border p-2 w-20">Keterangan</th>
+                                            <th class="border p-2 w-32">Jumlah</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr class="text-center text-base">
+                                            <th class="border p-2">Customer Relationship</th>
+                                            <th class="border p-2 ">{{ $penilaian->detail->cust_relation }} jumlah</th>
+                                          </tr>
+                                        </tbody>
+                                      </table>                                     
                                     </div>
                                   </div>   
                                   <!-- Lihat Detail perhitungan FUZZY END -->
                                 </div>
-                              <!-- Item 2  END -->
-                              <!-- Item 3 -->
-                                <div class="hidden duration-700 ease-in-out p-2 mb-6 overflow-auto" data-carousel-item>
-                                  <h1 class="text-xl font-semibold mx-2 mb-4 p-2 border-b-2">Detail Kerajinan</h1>
-                                  <div class="border-b-2">
-                                    <table id="tabel-akun" class="w-full border-collapse mb-4">
-                                      <thead class="bg-blue-400 text-white">
-                                        <tr class="text-center text-sm">
-                                          <th class="border p-2 w-44">Keterangan</th>
-                                          <th class="border p-2 w-28"><i class="bi bi-pencil-square"></i></th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <tr class="text-center text-base">
-                                          <th class="border p-2">Sakit (dg Surat Keterangan Dokter)</th>
-                                          <th class="border p-2 ">{{ $penilaian->formKerajinan->sakit }} hari</th>
-                                        </tr>
-                                        <tr class="text-center text-base">
-                                          <th class="border p-2">Izin / Sakit (Tanpa SKD)</th>
-                                          <th class="border p-2">{{ $penilaian->formKerajinan->izin }} hari</th>
-                                        </tr>
-                                        <tr class="text-center text-base">
-                                          <th class="border p-2">Tanpa Izin</th>
-                                          <th class="border p-2">{{ $penilaian->formKerajinan->tanpaizin }} hari</th>
-                                        </tr>
-                                        <tr class="text-center text-base">
-                                          <th class="border p-2">Datang Terlambat</th>
-                                          <th class="border p-2">{{ $penilaian->formKerajinan->terlambat }} jam</th>
-                                        </tr>
-                                        <tr class="text-center text-base">
-                                          <th class="border p-2">Pulang Cepat</th>
-                                          <th class="border p-2">{{ $penilaian->formKerajinan->pulangcepat }} jam</th>
-                                        </tr>                                          
-                                      </tbody>
-                                    </table>  
-                                  </div>
-                                </div>
-                              <!-- Item 3  END -->
-                              <!-- Item 4 -->
-                                <div class="hidden duration-700 ease-in-out p-2 mb-6 overflow-auto" data-carousel-item>
-                                  <h1 class="text-xl font-semibold mx-2 mb-4 p-2 border-b-2">Detail Analisis</h1>
-                                  <div class="border-b-2 pb-4">
-                                    <div class="w-full">
-                                      <div class="w-full mb-4 group">
-                                        <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian dengan SDM</label>  
-                                        <textarea for="rangkuman" 
-                                        type="text" name="rangkuman"
-                                        class="w-full h-32 max-h-max px-4 py-2 rounded-md resize-none" required>{{ $penilaian->formAnalisis->rangkuman }}</textarea>
-                                      </div>
-                                    </div>
-                                    <div class="grid md:grid-cols-2 md:gap-6 px-">
-                                      <div class="w-full mb-4 group">
-                                        <label for="kebutuhan" class="block text-gray-600 text-sm mb-2">Kebutuhan Training dan Development</label>  
-                                        <textarea for="kebutuhan" 
-                                        type="text" name="kebutuhan"
-                                        class="w-full h-32 max-h-max px-4 py-2 rounded-md resize-none" required>{{ $penilaian->formAnalisis->kebutuhan }}</textarea>
-                                      </div>
-                                      <div class="w-full mb-4 group">
-                                        <label for="rekomendasi" class="block text-gray-600 text-sm mb-2">Rekomendasi Terhadap SDI</label>  
-                                        <textarea for="rekomendasi" 
-                                        type="text" name="rekomendasi"
-                                        class="w-full h-32 max-h-max px-4 py-2 rounded-md resize-none" required>{{ $penilaian->formAnalisis->rekomendasi }}</textarea>
-                                      </div>
-                                    </div>
-                                    <div class="flex items-center">
-                                      <i class="bi bi-info-circle px-2 "></i>
-                                      <p class="font-bold text-lg">{{ $penilaian->formAnalisis->catatan }}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              <!-- Item 4  END -->                              
+                              <!-- Item 2  END -->                       
                             </div>
                             <!-- Slider indicators -->
                               <div class="absolute z-30 flex space-x-3 -translate-x-1/2 bottom-2 left-1/2">
                                   <button type="button" class="w-3 h-3 rounded-full bg-blue-200 border-1 border-blue-200" aria-current="true" aria-label="Slide 1" data-carousel-slide-to="0"></button>
                                   <button type="button" class="w-3 h-3 rounded-full bg-blue-200 border-1 border-blue-200" aria-current="true" aria-label="Slide 2" data-carousel-slide-to="1"></button>
-                                  <button type="button" class="w-3 h-3 rounded-full bg-blue-200 border-1 border-blue-200" aria-current="true" aria-label="Slide 3" data-carousel-slide-to="2"></button>
-                                  <button type="button" class="w-3 h-3 rounded-full bg-blue-200 border-1 border-blue-200" aria-current="true" aria-label="Slide 4" data-carousel-slide-to="3"></button>
                               </div>
                             <!-- Slider indicators END-->
                           </div>
@@ -527,16 +413,8 @@
                         <div class="flex flex-col items-center w-full md:w-[30%]">
                           <h1 class="text-2xl border-b-2 font-semibold mb-4 text-gray-600">Point Total</h1>
                           <div class="flex flex-col h-44 w-44 rounded-full items-center border-8 border-blue-400">
-                              <p class="text-6xl font-semibold mt-10 text-gray-600">{{ $penilaian->formFuzzy->point }}</p>
-                              @if($penilaian->formFuzzy->nilai == 'BR')
-                                <p class="text-xl font-semibold pt-2 text-gray-600">Rendah</p>
-                              @elseif($penilaian->formFuzzy->nilai == 'CB')
-                                <p class="text-xl font-semibold pt-2 text-gray-600">Cukup Baik</p>
-                              @elseif($penilaian->formFuzzy->nilai == 'BA')
-                                <p class="text-xl font-semibold pt-2 text-gray-600">Baik</p>
-                              @elseif($penilaian->formFuzzy->nilai == 'SB')
-                                <p class="text-xl font-semibold pt-2 text-gray-600">Sangat Baik</p>
-                              @endif
+                              <p class="text-4xl font-semibold mt-14 text-gray-600">{{ $penilaian->fuzzy->probabilitas }}</p>
+                              <p class="text-2xl font-semibold mt-2 text-gray-600">{{ $penilaian->fuzzy->probabilitas_him }}</p>
                           </div>
                         </div>                    
                         <!-- POINT / NILAI END -->                
@@ -560,13 +438,13 @@
       <!-- MODAL DETAIL END -->
       <!-- Modal HAPUS  -->
         @foreach ($dataPenilaian as $penilaian)
-          <form action="{{ route('penilaian.hapus', $penilaian->id) }}" method="POST">
+          <form action="{{ route('penilaian.hapus', $penilaian->id_penilaian) }}" method="POST">
             @csrf
             @method('DELETE')
-            <div id="popup-modal-{{ $penilaian->id }}" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div id="popup-modal-{{ $penilaian->id_penilaian }}" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
               <div class="relative w-full max-w-md max-h-full">
                   <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                      <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal-{{ $penilaian->id }}">
+                      <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="popup-modal-{{ $penilaian->id_penilaian }}">
                           <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                           </svg>
@@ -577,10 +455,10 @@
                               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                           </svg>
                           <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Apa anda yakin ingin menghapus data penilaian pada tanggal <label class="font-bold text-red-600 underline">{{ $penilaian->tgl_penilaian }}</label> ?</h3>
-                          <button data-modal-hide="popup-modal-{{ $penilaian->id }}" type="Submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                          <button data-modal-hide="popup-modal-{{ $penilaian->id_penilaian }}" type="Submit" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
                               Iya, Hapus data!
                           </button>
-                          <button data-modal-hide="popup-modal-{{ $penilaian->id }}" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                          <button data-modal-hide="popup-modal-{{ $penilaian->id_penilaian }}" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
                               Tidak, Batalkan!</button>
                       </div>
                   </div>
@@ -589,7 +467,8 @@
           </form>
         @endforeach
       <!-- Modal HAPUS END -->
-    <!-- MODAL END-->
+    <!-- MODAL END--> 
+
 
     <!-- SCRIPT DATATABLE -->
       <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
@@ -601,7 +480,7 @@
             searching: false,
             order: [[0, 'desc']],
             columnDefs: [
-                { targets: [7], orderable: false },
+                { targets: [6], orderable: false },
             ]
           });
         });
@@ -659,7 +538,7 @@
               },
           },
       });
-  </script>
+    </script>
   
     <!-- SCRIPT DIAGRAM END -->
 

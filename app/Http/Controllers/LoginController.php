@@ -28,19 +28,12 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Cek akses level setelah berhasil login
-            $user = Auth::user();
-
-            if ($user->hak_akses === 'admin') {
-                return redirect('/dashboard'); // Ganti dengan rute yang sesuai untuk admin
-            } elseif ($user->hak_akses === 'user') {
-                return redirect('/dashboard'); // Ganti dengan rute yang sesuai untuk user biasa
-            }
+            return redirect('/dashboard');
+        } else {
+            return back()->withErrors([
+                'username' => 'Username atau password salah.',
+            ]);
         }
-
-        return back()->withErrors([
-            'username' => 'The provided credentials do not match our records.',
-        ])->onlyInput('username');
     }
 
     public function logout()

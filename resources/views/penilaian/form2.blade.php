@@ -2,7 +2,7 @@
   @section('add_data','bg-gray-100')
     @section('container')
 
-                                        <!-- DIGUNAKAN HAYNA UNTUK MEMBUAT ATURAN  -->
+    <!-- DIGUNAKAN HAYNA UNTUK MEMBUAT ATURAN  -->
     <div class="main ml-64 pt-14 px-4">
       <!-- Detail karyawan dan penilai -->
         <div class="flex flex-col md:flex-row bg-white p-4 px-12 mt-4 m-2 rounded-md shadow-md">

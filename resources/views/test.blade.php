@@ -19,10 +19,9 @@
     <table>
         <thead>
             <tr>
-                <th>Penilaian</th>
+                <th>Absensi</th>
                 <th>Kerajinan</th>
                 <th>Kelebihan</th>
-                <th>Kekurangan</th>
                 <th>Output</th>
                 <th>Min</th>
                 <th>Z</th>
@@ -31,11 +30,10 @@
         <tbody>
             @foreach ($inferensi as $data)
                 <tr>
-                    <td>{{ $data['penilaian']['him'] }}</td>
-                    <td>{{ $data['kerajinan']['him'] }}</td>
-                    <td>{{ $data['kelebihan']['him'] }}</td>
-                    <td>{{ $data['kekurangan']['him'] }}</td>
-                    <td>{{ $data['rule']['output'] }}</td>
+                    <td>{{ $data['rule']['absensi'] }}</td>
+                    <td>{{ $data['rule']['produktif'] }}</td>
+                    <td>{{ $data['rule']['custrelation'] }}</td>
+                    <td>{{ $data['rule']['keputusan'] }}</td>
                     <td>{{ $data['minProbabilitas'] }}</td>
                     <td>{{ $data['z'] }}</td>
                     <td>{{ $data['a'] }}</td>
@@ -48,10 +46,11 @@
 
     <p>Hasil atas: {{ $defuzzyfikasi_numerator }} </p>
     <p>Hasil bawah: {{ $defuzzyfikasi_denominator }} </p>
-    <p>Hasil pembagian: {{ $defuzzyfikasi }} </p>
+    <p>Hasil Deffuzyfikasi: {{ $defuzzyfikasi }} </p>
+    <p>==============================================================</p>
     @foreach($hasil as $him => $nilaiA)
         <p>{{ $him }}: {{ $nilaiA }}</p>
     @endforeach
-    <p>Hasil Akhir: {{ $himTerbesar }} dengan point {{ $nilaiTerbesar }}</p>
+    <p>Hasil Akhir : <label class="text-base font-semibold">{{ $himTerbesar }}</label> dengan point {{ $nilaiTerbesar }}</p>
 </body>
 </html>

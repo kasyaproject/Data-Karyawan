@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\data_karyawan;
-use App\Models\form_penilaian;
+use App\Models\penilaian;
 use App\Models\divisi;
 use App\Models\hasil_fuzzy;
 use App\Models\Image;
@@ -27,6 +27,7 @@ class karyawanController extends Controller
     {
         $data = data_karyawan::with('image')->where('nik', $nik)->first();
 
+        /////////////////////////////////////////////// BIODATA ////////////////////////////////////////////
         // Ubah format mulaikerja menjadi "d - F - Y"
         $data->mulaikerja_formatted = Carbon::parse($data->mulaikerja)->format('d - F - Y');
         // Hitung lama kerja dalam tahun dan bulan
@@ -36,9 +37,9 @@ class karyawanController extends Controller
         // Tambahkan informasi lama kerja ke dalam data karyawan
         $data->lama_kerja = $lamaKerja;
 
+        //////////////////////////////////////////// TABEL PENILAIAN ////////////////////////////////////////////
         // pemanggilan data untuk di table penilaian
         $dataPenilaian = $data->penilaians;
-        //$dataPenilaian->tglpenilaian = Carbon::parse($data->tgl_penilaian)->format('d - F - Y');;
 
         // pemanggilan data untuk chartjs
         $dataPenilaianForChart = [];
@@ -48,7 +49,7 @@ class karyawanController extends Controller
         foreach ($dataPenilaianLimited as $penilaian) {
             $dataPenilaianForChart[] = [
                 'tgl_penilaian' => $penilaian->tgl_penilaian,
-                'point' => $penilaian->formFuzzy->point,
+                'point' => $penilaian->fuzzy->probabilitas,
             ];
         }
 
@@ -187,16 +188,15 @@ class karyawanController extends Controller
     //hapus data penilaian
     public function destroy($id)
     {
-        $formPenilaian = form_penilaian::find($id);
+        $formPenilaian = penilaian::find($id);
 
         if (!$formPenilaian) {
             return redirect()->back()->with('error', 'Penilaian tidak ditemukan.');
         }
 
         // Menghapus relasi terlebih dahulu
-        $formPenilaian->formKerajinan()->delete();
-        $formPenilaian->formAnalisis()->delete();
-        $formPenilaian->formFuzzy()->delete();
+        $formPenilaian->detail()->delete();
+        $formPenilaian->fuzzy()->delete();
 
         // Menghapus dirinya sendiri
         $formPenilaian->delete();

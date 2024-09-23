@@ -27,12 +27,12 @@ class data_karyawan extends Model
 
     public function penilaians()
     {
-        return $this->hasMany(form_penilaian::class, 'nik_karyawan', 'nik')
+        return $this->hasMany(penilaian::class, 'nik_karyawan', 'nik')
             ->orderBy('tgl_penilaian', 'desc');
     }
 
     public function hasilFuzzy()
     {
-        return $this->hasOne(hasil_fuzzy::class, 'nik_karyawan', 'nik');
+        return $this->hasOne(fuzzy::class, 'nik_karyawan', 'nik');
     }
 }

@@ -59,7 +59,7 @@
       <form action="/data/form/{nik}" method="post" class="w-full pb-8">
         @csrf
         <!-- Data detail penilai -->
-          <input type="hidden" name="tgl_penilaian" value="{{ now() }}">
+          <input type="hidden" name="tgl_penilaian" value="{{ now()->setTimezone('Asia/Jakarta') }}">
           <input type="hidden" name="nik_karyawan" value="{{ $data->nik }}">
           <input type="hidden" name="nama_penilai" value="{{ $penilai->nama }}">
           @if ($penilai->hak_akses === 'admin')
@@ -67,65 +67,11 @@
           @else
               <input type="hidden" name="verifikasi" value="no">
           @endif
-        <!-- Data detail penilai END -->
 
-        <!-- Form Penilaian Karyawan -->
-          <div class="bg-white p-4 m-2 rounded-lg shadow-md">
-            <div class="px-4 pb-2 border-b-2">
-              <label class="font-bold text-xl ">Form Penilaian SDM</label>
-              <p class="w-2/3 text-gray-600">Form penilaian SDM dibuat untuk menilai kinerja SDM yang dilakukan oleh atasan, dimana penilaian dilakukan secara subjektif. penilaian ini dilakukan dengan point dimulai dari 1 - 100 point yang menunjukan kinerja SDM tersebut.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 md:gap-6 px-8 pt-8">
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="kerajinan" class="block text-gray-600 text-sm mb-2">Kerajinan</label>  
-                <input for="kerajinan" name="kerajinan" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="loyalitas" class="block text-gray-600 text-sm mb-2">Loyalitas</label>  
-                <input for="loyalitas" name="loyalitas" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 md:gap-6 px-8">
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="inisiatif" class="block text-gray-600 text-sm mb-2">Inisiatif</label>  
-                <input for="inisiatif" name="inisiatif" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="kerjasama" class="block text-gray-600 text-sm mb-2">Kerja Sama</label>  
-                <input for="kerjasama" name="kerjasama" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 md:gap-6 px-8">
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="integritas" class="block text-gray-600 text-sm mb-2">Integritas</label>  
-                <input for="integritas" name="integritas" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="daqumethod" class="block text-gray-600 text-sm mb-2">Daqu Method</label>  
-                <input for="daqumethod" name="daqumethod" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-            </div>
-
-            <div class="grid md:grid-cols-2 md:gap-6 px-8">
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="custrelation" class="block text-gray-600 text-sm mb-2">Customer Relationship</label>  
-                <input for="custrelation" name="custrelation" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-              <div class="relative z-0 w-full mb-6 group">
-                <label for="kerapihan" class="block text-gray-600 text-sm mb-2">Kerapihan</label>  
-                <input for="kerapihan" name="kerapihan" type="number" min="0" max="100" oninput="limitValue(this, 0, 100);" class="w-full px-4 py-2 rounded-md" placeholder="1 ~ 100 point" required>
-              </div>
-            </div>
-          </div>
-        <!-- Form Penilaian Karyawan END-->
-
-        <!-- Form Kerajinan Karyawan -->
+        <!-- Form Absensi Karyawan -->
           <div class="bg-white m-2 p-4 rounded-lg shadow-md">
             <div class="px-4 pb-2 border-b-2">
-              <label class="font-bold text-xl ">Form Kerajinan</label>
+              <label class="font-bold text-xl ">Form Absensi</label>
               <p class="w-2/3 text-gray-600">Identifikasikan tingkat kehadiran dan juga pelanggaran jam kerja dari SDM yang anda nilai.</p>
             </div>
 
@@ -161,102 +107,48 @@
               </div>
             </div>
           </div>
-        <!-- Form Kerajinan Karyawan -->
+        <!-- Form Absensi Karyawan -->
 
-        <!-- Form Analisis Kekuatan dan Kelemahan -->
-          <div class="bg-white m-2 p-4 rounded-lg shadow-md">
-            <div class="px-4 pb-2 border-b-2">
-              <label class="font-bold text-xl ">Form Analisis Kekuatan dan Kelemahan</label>
-              <p class="w-2/3 text-gray-600">Identifikasikan kekuatan dan kelemahan dari SDM yang anda nilai. Dan kemukakan perkembangan apa yang anda inginkan untuk SDM tersebut pada periode mendatang.</p>
-            </div>
-            <!-- Kelebihan & Kekurangan-->
-            <div class="mt-2">
-              <div class="grid md:grid-cols-2 md:gap-6 px-8 pt-8">
-                <div class="relative z-0 w-full mb-4 group">
-                  <label for="kelebihan" class="block text-gray-600 text-sm mb-2">Kelebihan</label>  
-                  <select name="kelebihan[]" id="kelebihan" multiple required>
-                    <option value="Kemampuan Berkomunikasi">Kemampuan Berkomunikasi</option>
-                    <option value="Kreativitas & Inovasi">Kreativitas & Inovasi</option>
-                    <option value="Kerja Tim Solid">Kerja Tim Solid</option>
-                    <option value="Pemecahan Masalah">Pemecahan Masalah</option>
-                    <option value="Inisiatif & Proaktif">Inisiatif & Proaktif</option>
-                    <option value="Kemampuan Analisis">Kemampuan Analisis</option>
-                    <option value="Pengelolaan Waktu">Pengelolaan Waktu</option>
-                    <option value="Kepemimpinan">Kepemimpinan</option>
-                    <option value="Keterampilan Teknis">Keterampilan Teknis</option>
-                    <option value="Keandalan">Keandalan</option>
-                  </select>
-                </div>
-                <div class="relative z-0 w-full mb-4 group">
-                  <label for="kekurangan" class="block text-gray-600 text-sm mb-2">Kekurangan</label>  
-                  <select name="kekurangan[]" id="kekurangan" multiple required>
-                    <option value="Ketidaktepatan Pekerjaan">Ketidaktepatan Pekerjaan</option>
-                    <option value="Kurang Kemauan Belajar">Kurang Kemauan Belajar</option>
-                    <option value="Rendah Produktivitas">Rendah Produktivitas</option>
-                    <option value="Kurang Komitmen">Kurang Komitmen</option>
-                    <option value="Kurang Berinisiatif">Kurang Berinisiatif</option>
-                    <option value="Sulit Tangani Kritik">Sulit Tangani Kritik</option>
-                    <option value="Tidak Kuat Tekanan">Tidak Kuat Tekanan</option>
-                    <option value="Kurang Kolaborasi">Kurang Kolaborasi</option>
-                    <option value="Ketidaktaatan Aturan">Ketidaktaatan Aturan</option>
-                    <option value="Ketidakefisienan Tugas">Ketidakefisienan Tugas</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <!-- Kelebihan & Kekurangan END-->
-            <!-- Rangkuman -->
-            <div class="w-full px-8">
-              <div class="w-full mb-4 group">
-                <label for="rangkuman" class="block text-gray-600 text-sm mb-2">Rangkuman diskusi penilaian ini dengan SDM yang dinilai</label>  
-                <textarea for="rangkuman" 
-                type="text" name="rangkuman"
-                class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
-              </div>
-            </div>
-            <!-- Rangkuman END-->
-            <!-- Kebutuhan & Rekomendasi -->
-            <div class="mt-2">
-              <div class="grid md:grid-cols-2 md:gap-6 px-8">
-                <div class="w-full mb-4 group">
-                  <label for="kebutuhan" class="block text-gray-600 text-sm mb-2">Kebutuhan Training dan Development</label>  
-                  <textarea for="kebutuhan" 
-                  type="text" name="kebutuhan"
-                  class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
-                </div>
-                <div class="w-full mb-4 group">
-                  <label for="rekomendasi" class="block text-gray-600 text-sm mb-2">Rekomendasi Terhadap SDM ini</label>  
-                  <textarea for="rekomendasi" 
-                  type="text" name="rekomendasi"
-                  class="w-full h-32 px-4 py-2 rounded-md resize-none" required></textarea>
-                </div>
-              </div>
-            </div>
-            <!-- Kebutuhan & Rekomendasi END-->           
-            <!-- Catatan Akhir -->
-            <div class="mt-2">
-              <label for="catatan" class="block text-gray-600 text-sm mb-2 px-8">Catatan Akhir</label>
-              <div class="grid px-12">
-                  <div class="flex items-center mb-1">
-                      <input type="radio" id="option1" name="catatan" value="Dilanjut sebagai karyawan kontrak" class="form-radio text-indigo-600" required>
-                      <label for="option1" class="ml-2 text-gray-700 text-sm  ">Dilanjut sebagai <label class="text-blue-600 font-semibold">Karyawan kontrak</label></label>
-                  </div>            
-                  <div class="flex items-center mb-1">
-                      <input type="radio" id="option2" name="catatan" value="Dilanjut sebagai karyawan tetap" class="form-radio text-indigo-600">
-                      <label for="option2" class="ml-2 text-gray-700 text-sm">Dilanjut sebagai <label class="text-blue-600 font-semibold">Karyawan tetap</label></label>
-                  </div>            
-                  <div class="flex items-center mb-1">
-                      <input type="radio" id="option3" name="catatan" value="Tidak dilanjut" class="form-radio text-indigo-600">
-                      <label for="option3" class="ml-2 text-gray-700 text-sm">Tidak dlanjut</label>
-                  </div>
-              </div>
-            </div>          
-            <!-- Catatan Akhir END-->
-            <div class="flex justify-end px-4 mx-4 mt-4">
-              <button type="submit" class="bg-blue-500 text-white font-bold px-4 py-2 rounded">Buat Penilaian</button>
+        <!-- Form Absensi Karyawan -->
+        <div class="bg-white m-2 p-4 rounded-lg shadow-md">
+          <div class="px-4 pb-2 border-b-2">
+            <label class="font-bold text-xl">Form Produktifitas</label>
+            <p class="w-2/3 text-gray-600">Identifikasikan jumlah pelayanan yang telah diselesaikan dari SDM yang anda nilai.</p>
+          </div>
+
+          <div class="flex px-8 pt-8">
+            <div class="relative z-0 w-full mb-6 group">
+              <label for="produktif" class="block text-gray-600 text-sm mb-2">Produktifitas</label>
+              <input for="produktif" id="produktif" name="produktif" type="number" class="w-full px-4 py-2 rounded-md" min="100" max="1800" oninput="limitValue(this, 0, 1800);" placeholder="100 ~ 1800" required>
             </div>
           </div>
-        <!-- Form Analisis Kekuatan dan Kelemahan END-->
+        </div>
+        <!-- Form Produktif Karyawan END -->
+
+        <!-- Form Custrelation Karyawan -->
+        <div class="bg-white m-2 p-4 rounded-lg shadow-md">
+          <div class="px-4 pb-2 border-b-2">
+            <label class="font-bold text-xl">Form Customer Relationship</label>
+            <p class="w-2/3 text-gray-600">Identifikasikan jumlah kepuasan dari pelayanan yang telah diselesaikan dari SDM yang anda nilai.</p>
+          </div>
+
+          <div class="flex px-8 pt-8">
+            <div class="relative z-0 w-full mb-2 group">
+              <label for="custrelation" class="block text-gray-600 text-sm mb-2">Customer Relationship</label>
+              <input for="custrelation" id="custrelation" name="custrelation" type="number" class="w-full px-4 py-2 rounded-md" min="100" max="1800" oninput="CompareValue(this, 0, 1800);" placeholder="0 ~ 1800" required>
+              <label for="custrelation" class="block text-gray-600 text-sm mt-3">Jumlah kepuasan pelayanan terhadap customer tidak akan melebihi jumlah dari inputan pada form Produktifitas</label>
+            </div>
+          </div>
+        </div>
+        <!-- Form Custrelation Karyawan END -->
+        
+        <!-- Button -->
+        <div class="bg-white m-2 rounded-lg shadow-md">
+          <div class="text-center">
+            <button type="submit" class="w-full text-white font-semibold px-4 py-2 rounded-md bg-indigo-500 hover:bg-indigo-600 ">Buat Data</button>
+          </div>
+        </div>
+        <!-- Button END -->
       </form>
     </div>
 
@@ -271,10 +163,15 @@
         }
       }
 
-      // Kelebihan & kekurangan select tag
-      new MultiSelectTag('kelebihan')  // id
-      new MultiSelectTag('kekurangan')  // id
-      new MultiSelectTag('catatan')  // id
+      function CompareValue(input, min, max) {
+        var produktifValue = parseInt(document.getElementById('produktif').value, 10);
+
+        if (input.value < min) {
+          input.value = min;
+        } else if (input.value > produktifValue) {
+          input.value = produktifValue;
+        }
+      }
     </script>
 
     @endsection

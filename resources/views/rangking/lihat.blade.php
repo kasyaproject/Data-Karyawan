@@ -42,28 +42,24 @@
               {{-- Kiri END --}}
               {{-- Tengah --}}
               <div class="flex w-[35%]">
-                <div class=" mr-4">
-                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->hasil ?? '-' }}</p>
-                  <label class="text-base">Penilaian</label>
+                <div class="mr-14">
+                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->detail->hasil_absensi ?? '-' }}</p>
+                  <label class="text-base">Absensi</label>
+                </div>
+                <div class="mr-6">
+                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->detail->produktifitas ?? '-' }}</p>
+                  <label class="text-base">Produktifitas</label>
                 </div>
                 <div class="mx-2">
-                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->formKerajinan->hasil ?? '-' }}</p>
-                  <label class="text-base">Kerajinan</label>
-                </div>
-                <div class="mx-2">
-                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->formAnalisis->hasil_kelebihan ?? '-' }}</p>
-                  <label class="text-base">Kelebihan</label>
-                </div>
-                <div class="ml-4">
-                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->formAnalisis->hasil_kekurangan ?? '-' }}</p>
-                  <label class="text-base">Kekurangan</label>
+                  <p class="text-3xl font-semibold mb-2">{{ optional($item->penilaians->first())->detail->cust_relation ?? '-' }}</p>
+                  <label class="text-base">Customer Relationship</label>
                 </div>
               </div>
               {{-- Tengah END --}}
               {{-- Kanan --}}
               <div class="mr-8">
-                <p class="text-5xl font-extrabold mb-1">{{ optional($item->penilaians->first())->formFuzzy->point ?? '-' }}</p>
-                <label class="text-xl font-semibold">Total Point</label>
+                <p class="text-3xl font-extrabold mb-1">{{ optional($item->penilaians->first())->fuzzy->probabilitas ?? '-' }}</p>
+                <label class="text-xl font-semibold">Probabilitas</label>
               </div>
               {{-- Kanan END --}}
             </a>
